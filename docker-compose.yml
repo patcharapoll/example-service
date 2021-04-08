@@ -1,0 +1,50 @@
+version: '3.8'
+services:
+  app:
+    container_name: example-service
+    build:
+      context: .
+      dockerfile: dockerfile.dev
+    environment:
+      - PORT=3001
+      - ENV=localhost
+      - DB_USER=postgres
+      - DB_PASSWORD=postgres
+      - DB_NAME=port
+      - DB_HOST=port_db
+      - DB_DRIVER=postgres
+      - DB_PORT=5432
+
+    ports:
+      - 3001:3001
+    restart: on-failure
+    volumes:
+      - .:/app
+    depends_on: 
+      - example_db
+    networks:
+      - fullstack
+
+  example_db:
+    image: postgres:latest
+    container_name: example_db_postgres
+    environment: 
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=port
+    ports:
+      - '5435:5432'
+    volumes: 
+      - database_postgres:/var/lib/postgresql/data
+    networks:
+      - fullstack
+
+volumes:
+  api:
+  database_postgres:
+
+# Networks to be created to facilitate communication between containers
+networks: 
+  fullstack:
+    external: true
+    driver: bridge
